@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "39180378564",
+    "project_id": "cocinando-ando-94999",
+    "storage_bucket": "cocinando-ando-94999.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:39180378564:android:a2d242b90bc7bacd14c491",
+        "android_client_info": {
+          "package_name": "com.example.cocinando_ando"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzN9Xi7fIH0yjwsLpmYGOBZuH1YhX0tos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
