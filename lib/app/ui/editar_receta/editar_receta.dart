@@ -1,4 +1,3 @@
-import 'package:cocinando_ando/app/ui/home/home_controller.dart';
 import 'package:cocinando_ando/app/widgets/appBar_custom.dart';
 import 'package:cocinando_ando/app/widgets/botones.dart';
 import 'package:cocinando_ando/app/widgets/textField_custom.dart';
@@ -23,6 +22,7 @@ class StateEditar extends State<EditarReceta> {
   final TextEditingController _tiempoDePreparacionReceta =
       TextEditingController();
   String _errorMessage = '';
+  String? _tipoSeleccionado;
 
   @override
   void initState() {
@@ -30,7 +30,6 @@ class StateEditar extends State<EditarReceta> {
     _cargarReceta();
   }
 
-  // Función para cargar la receta desde Firestore
   Future<void> _cargarReceta() async {
     if (widget.recetaId == null) {
       print("Error: recetaId no proporcionado.");
@@ -51,6 +50,7 @@ class StateEditar extends State<EditarReceta> {
             recetaData['pasosParaRealizarReceta'] ?? '';
         _ingredientesReceta.text = recetaData['ingredientes'] ?? '';
         _tiempoDePreparacionReceta.text = recetaData['tiempoPreparacion'] ?? '';
+        _tipoSeleccionado = recetaData['tipoReceta'] ?? '';
       } else {
         setState(() {
           _errorMessage = 'Receta no encontrada';
@@ -63,12 +63,12 @@ class StateEditar extends State<EditarReceta> {
     }
   }
 
-  // Función para salvar los cambios
   Future<void> _salvarCambios() async {
     if (_nombreReceta.text.isEmpty ||
         _pasosParaRealizarReceta.text.isEmpty ||
         _ingredientesReceta.text.isEmpty ||
-        _tiempoDePreparacionReceta.text.isEmpty) {
+        _tiempoDePreparacionReceta.text.isEmpty ||
+        _tipoSeleccionado == null) {
       setState(() {
         _errorMessage = 'Por favor completa todos los campos';
       });
@@ -87,6 +87,7 @@ class StateEditar extends State<EditarReceta> {
       'pasosParaRealizarReceta': _pasosParaRealizarReceta.text,
       'tiempoPreparacion': _tiempoDePreparacionReceta.text,
       'ingredientes': _ingredientesReceta.text,
+      'tipoReceta': _tipoSeleccionado,
     };
 
     try {
@@ -96,16 +97,52 @@ class StateEditar extends State<EditarReceta> {
           .update(recetaActualizada);
 
       setState(() {
-        _errorMessage = ''; // Limpiar el mensaje de error
+        _errorMessage = '';
       });
 
       print('Receta actualizada correctamente.');
-      context.go('/'); // Navegar a la página principal después de guardar
+      context.go('/');
     } catch (e) {
       setState(() {
         _errorMessage = 'Error al actualizar la receta: $e';
       });
     }
+  }
+
+  Future<void> _seleccionarTipo() async {
+    final List<String> tipos = [
+      'Entrada',
+      'Plato Principal',
+      'Postre',
+      'Bebida'
+    ];
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Selecciona el tipo de receta'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: tipos.map((tipo) {
+              return ListTile(
+                title: Text(tipo),
+                leading: Radio<String>(
+                  value: tipo,
+                  groupValue: _tipoSeleccionado,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _tipoSeleccionado = value;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -116,7 +153,7 @@ class StateEditar extends State<EditarReceta> {
         slivers: [
           SliverToBoxAdapter(
             child: AppbarCustom(
-              title: 'Cocinando Ando',
+              title: 'Editar Receta',
               button: IconButton(
                 onPressed: () => context.pushReplacement('/'),
                 icon: const Icon(Icons.arrow_back_ios_new),
@@ -135,7 +172,7 @@ class StateEditar extends State<EditarReceta> {
                       color: Color(0xffF4A460),
                       child: Center(
                         child: Text(
-                          'Llena las casillas con los datos que se piden',
+                          'Edita los datos de la receta',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Color(0xff8B4513),
@@ -153,24 +190,22 @@ class StateEditar extends State<EditarReceta> {
                     controller: _nombreReceta,
                     backgroundColor: const Color(0xffF4A460),
                     isObscure: false,
+                    textInputAction: TextInputAction.done,
+                    textType: TextInputType.text,
                   ),
                   const SizedBox(height: 40),
-                  TextfieldCustom(
+                  TextfieldCustomMultiline(
                     hintText: 'Descripción',
                     labelText: 'Descripción',
                     controller: _pasosParaRealizarReceta,
                     backgroundColor: const Color(0xffF4A460),
-                    isObscure: false,
-                    textType: TextInputType.multiline,
                   ),
                   const SizedBox(height: 40),
-                  TextfieldCustom(
+                  TextfieldCustomMultiline(
                     hintText: 'Ingredientes',
                     labelText: 'Ingredientes',
                     controller: _ingredientesReceta,
                     backgroundColor: const Color(0xffF4A460),
-                    isObscure: false,
-                    textType: TextInputType.multiline,
                   ),
                   const SizedBox(height: 40),
                   TextfieldCustom(
@@ -179,6 +214,17 @@ class StateEditar extends State<EditarReceta> {
                     controller: _tiempoDePreparacionReceta,
                     backgroundColor: const Color(0xffF4A460),
                     isObscure: false,
+                  ),
+                  const SizedBox(height: 40),
+                  ElevatedButton(
+                    onPressed: _seleccionarTipo,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xffF4A460),
+                    ),
+                    child: Text(
+                      _tipoSeleccionado ?? 'Seleccionar tipo de receta',
+                      style: const TextStyle(color: Color(0xff8B4513)),
+                    ),
                   ),
                   if (_errorMessage.isNotEmpty) ...[
                     const SizedBox(height: 20),
@@ -192,7 +238,7 @@ class StateEditar extends State<EditarReceta> {
                   ),
                   Botones(
                     onPressed: _salvarCambios,
-                    child: const Text('Guardar receta'),
+                    child: const Text('Guardar cambios'),
                   ),
                 ],
               ),
