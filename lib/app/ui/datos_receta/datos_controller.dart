@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cocinando_ando/app/ui/datos_receta/receper_header.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DatosController extends StatelessWidget {
   final String? recetaId;
@@ -45,15 +46,18 @@ class DatosController extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: <Widget>[
                   RecipeHeader(
                     nombreReceta: nombreReceta,
                     onSave: () {},
                     onShare: () {},
+                    editing: () {
+                      context.go('/editar/:recetaId');
+                    },
                   ),
                   const SizedBox(height: 10),
                   Row(
-                    children: [
+                    children: <Widget>[
                       Image.network(
                         'https://cdn-icons-png.flaticon.com/512/4100/4100980.png',
                         height: 30,

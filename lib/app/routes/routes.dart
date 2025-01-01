@@ -4,6 +4,7 @@ import 'package:cocinando_ando/app/ui/datos_receta/datos_receta.dart';
 import 'package:cocinando_ando/app/ui/editar_receta/editar_receta.dart';
 import 'package:cocinando_ando/app/ui/home/home_screen.dart';
 import 'package:cocinando_ando/app/ui/iniciar_sesion/iniciar_sesion.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 final router = GoRouter(
@@ -11,32 +12,37 @@ final router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, value) => HomeScreen(),
+      builder: (context, state) => HomeScreen(),
     ),
     GoRoute(
       path: '/agregar',
-      builder: (context, value) => const AgregarRecetaScreen(),
+      builder: (context, state) => const AgregarRecetaScreen(),
     ),
     GoRoute(
       path: '/registro',
-      builder: (context, value) => const AuthUsuario(),
+      builder: (context, state) => const AuthUsuario(),
     ),
     GoRoute(
       path: '/sesion',
-      builder: (context, value) => const IniciarSesion(),
+      builder: (context, state) => const IniciarSesion(),
     ),
     GoRoute(
-      path: '/datos/:recetaId', // Usamos :recetaId como parámetro en la ruta
-      builder: (context, value) {
-        final recetaId = value.pathParameters[
-            'recetaId']!; // Obtener recetaId desde los parámetros
-        return DatosReceta(
-            recetaId: recetaId); // Pasamos recetaId a la pantalla
+      path: '/datos/:recetaId',
+      builder: (context, state) {
+        final recetaId = state.pathParameters['recetaId']!;
+        return DatosReceta(recetaId: recetaId);
       },
     ),
     GoRoute(
-      path: '/editar',
-      builder: (context, value) => const EditarReceta(),
+      path: '/editar/:recetaId',
+      builder: (context, state) {
+        final recetaId = state.pathParameters['recetaId'];
+        if (recetaId == null) {
+          return const Scaffold(
+              body: Center(child: Text('Error: No se proporcionó recetaId')));
+        }
+        return EditarReceta(recetaId: recetaId);
+      },
     ),
   ],
 );

@@ -4,13 +4,15 @@ class RecipeHeader extends StatelessWidget {
   final String nombreReceta;
   final VoidCallback onSave;
   final VoidCallback onShare;
+  final VoidCallback editing;
 
   const RecipeHeader({
     required this.nombreReceta,
     required this.onSave,
     required this.onShare,
-    Key? key,
-  }) : super(key: key);
+    required this.editing,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +33,11 @@ class RecipeHeader extends StatelessWidget {
         InkWell(
           onTap: onSave,
           child: Icon(Icons.save, size: 30),
+        ),
+        const SizedBox(width: 15),
+        InkWell(
+          onTap: editing,
+          child: Icon(Icons.edit, size: 30),
         ),
       ],
     );
